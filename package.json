@@ -2,13 +2,16 @@
   "name": "mangasee-api",
   "version": "1.0.0",
   "main": "src/index.ts",
+  "types": "src/index.d.ts",
   "scripts": {
     "dev": "nodemon",
+    "prepublish": "tsc",
     "start:prod": "tsc & node dist/index.js"
   },
   "author": "",
   "license": "ISC",
   "description": "",
+  "type": "module",
   "devDependencies": {
     "nodemon": "^3.1.3",
     "ts-node": "^10.9.2",

@@ -4,9 +4,9 @@ import { getCoverImageUrl, getFirstChapterUrl } from "./utils";
 import { MangaRecord, RawMangaRecord } from "./types";
 import Fuse from "fuse.js";
 
-export const mangaRecords: MangaRecord[] = [];
+const mangaRecords: MangaRecord[] = [];
 
-const getMangaList = async () => {
+export const getMangaList = async () => {
   const res: RawMangaRecord[] = (await axios.get(mangaSeeSearch)).data;
   res.forEach((rawMangaRecord) => {
     mangaRecords.push({
@@ -18,7 +18,7 @@ const getMangaList = async () => {
   });
 };
 
-const search = (term: string) => {
+export const search = (term: string) => {
   const fuse = new Fuse(mangaRecords, {
     keys: ["nicknames", "fullName"],
     threshold: 0.3,
@@ -31,7 +31,7 @@ const search = (term: string) => {
 };
 
 
-const getMangaDetails = async (canonicalName: string = "Skeleton-Double") => {
+export const getMangaDetails = async (canonicalName: string = "Skeleton-Double") => {
   const firstChapterUrl = getFirstChapterUrl(canonicalName)
   const res = (await axios.get(firstChapterUrl)).data as string;
   const chapterDetailsPattern = /vm\.CHAPTERS = (.*);/;
@@ -47,8 +47,4 @@ const getMangaDetails = async (canonicalName: string = "Skeleton-Double") => {
 
 (async () => {
   await getMangaList();
-  console.log("Done Fetching Data");
-  const searchRes = search("skeLEton Double");
-  console.log(JSON.stringify(searchRes));
-  getMangaDetails()
 })();
