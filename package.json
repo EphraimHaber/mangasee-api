@@ -6,6 +6,12 @@
   "repository": {
     "url": "https://github.com/EphraimHaber/mangasee-api"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "dev": "nodemon",
     "prettier": "npx prettier --write .",
