@@ -1,7 +1,14 @@
 import axios from 'axios';
-import { parseString } from 'xml2js';
-import { mangaCoverBaseUrl, mangaReadOnlineBaseUrl, rssBaseUrl } from './constants';
+import {
+  mangaCoverBaseUrl,
+  mangaReadOnlineBaseUrl,
+  mangaSlideBaseUrl,
+  chapterWithPaddingLength,
+  rssBaseUrl,
+  slideWithPaddingLength,
+} from './constants';
 import { XMLParser } from 'fast-xml-parser';
+import { RssDetails } from './types/types';
 
 export const getCoverImageUrl = (uri: string): string => {
   return `${mangaCoverBaseUrl}${uri}.jpg`;
@@ -11,12 +18,33 @@ export const getFirstChapterUrl = (uri: string): string => {
   return `${mangaReadOnlineBaseUrl}${uri}-chapter-1.html`;
 };
 
-export const getTitleAndCoverUrl = async (canonicalName: string) => {
+export const toPaddedChapter = (chapter: number): string => {
+  const chapterString = chapter.toString();
+  const padding = '0'.repeat(chapterWithPaddingLength - chapterString.length);
+  return `1${padding}${chapterString}0`;
+};
+
+export const toRealChapter = (paddedChapter: string): number => {
+  const trimmedPaddedChapter = paddedChapter.slice(1, -1);
+  return Number(trimmedPaddedChapter);
+};
+
+export const getSlideUrl = (canonicalName: string, chapter: number, slideNumber: number): string => {
+  const chapterString = chapter.toString();
+  const slideString = slideNumber.toString();
+  const chapterPadding = '0'.repeat(chapterWithPaddingLength - chapterString.length);
+  const slidePadding = '0'.repeat(slideWithPaddingLength - slideString.length);
+  return `${mangaSlideBaseUrl}${canonicalName}/${chapterPadding}${chapterString}-${slidePadding}${slideString}.png`;
+};
+
+export const getRssDetails = async (canonicalName: string): Promise<RssDetails> => {
   const link = `${rssBaseUrl}${canonicalName}.xml`;
-  console.log(link);
   const res = (await axios.get(link)).data;
   const parser = new XMLParser();
-  let jObj = parser.parse(res);
-  console.log(jObj);
-  console.log(jObj.rss.channel.image);
+  const mangaRssJsonDetails = parser.parse(res);
+  return {
+    fullName: mangaRssJsonDetails.rss.channel.title,
+    coverUrl: mangaRssJsonDetails.rss.channel.image.url,
+    link: mangaRssJsonDetails.rss.channel.link,
+  };
 };
