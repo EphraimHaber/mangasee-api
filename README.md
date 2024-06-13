@@ -10,27 +10,8 @@ every Api should have 3 methods:
 
 ```typescript
 interface Api {
-  search: (term: string) => MangaDetails[];
-  getDetails: (uri: string) => MangaDetails;
-  getSlides: (uri: string, episode: number) => string[];
+  search: (term: string) => Promise<MangaRecord[]>;
+  getDetails: (uri: string) => Promise<MangaDetails>;
+  getChapterSlides: (canonicalName: string, chapter: number, totalSlides: number) => string[];
 }
-
-const apiList: Record<MangaProvider, Api> = {};
-
-// how to use in the client:
-
-const searchManga = (term: string): Record<MangaProvider, MangaDetails[]> => {
-  const results: Record<MangaProvider, MangaDetails[]> = {};
-
-  for (const api in apiList) {
-    results[api] = apiList[api].search(term);
-  }
-
-  return results;
-};
-
-const getMangaDetails = (provider: MangaProvider, uri: string): MangaDetails => apiList[provider].getDetails(uri);
-
-const getEpisodeSlides = (provider: MangaProvider, uri: string, episode: number): string[] =>
-  apiList[provider].getSlides(uri, episode);
 ```
