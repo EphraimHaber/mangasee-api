@@ -1,5 +1,6 @@
 import axios from "axios";
 import { mangaSeeSearch } from "./constants";
+import { getCoverImageUrl, getFirstChapterUrl } from "./utils";
 import { MangaRecord, RawMangaRecord } from "./types";
 import Fuse from "fuse.js";
 
@@ -10,14 +11,16 @@ const getMangaList = async () => {
   res.forEach((rawMangaRecord) => {
     mangaRecords.push({
       canonicalName: rawMangaRecord.i,
-      nicknames: [rawMangaRecord.s, ...rawMangaRecord.a],
+      fullName: rawMangaRecord.s,
+      nicknames: [...rawMangaRecord.a],
+      coverUrl: getCoverImageUrl(rawMangaRecord.i)
     });
   });
 };
 
 const search = (term: string) => {
   const fuse = new Fuse(mangaRecords, {
-    keys: ["nicknames"],
+    keys: ["nicknames", "fullName"],
     threshold: 0.3,
     includeScore: true,
     isCaseSensitive: false,
@@ -27,17 +30,25 @@ const search = (term: string) => {
   return res;
 };
 
+
+const getMangaDetails = async (canonicalName: string = "Skeleton-Double") => {
+  const firstChapterUrl = getFirstChapterUrl(canonicalName)
+  const res = (await axios.get(firstChapterUrl)).data as string;
+  const chapterDetailsPattern = /vm\.CHAPTERS = (.*);/;
+  const chaptersGroups = chapterDetailsPattern.exec(res)
+  console.log("************************")
+  // 1: {}
+  // 2: {}
+  // [{"Chapter":"100010","Type":"Chapter","Page":"73","Directory":"","Date":"2022-09-12 17:54:04","ChapterName":null}]
+  if (chaptersGroups) {
+    console.log(chaptersGroups[1]);
+  }
+}
+
 (async () => {
   await getMangaList();
   console.log("Done Fetching Data");
-  const searchRes = search("skeLEton");
+  const searchRes = search("skeLEton Double");
   console.log(JSON.stringify(searchRes));
+  getMangaDetails()
 })();
-
-const lol = [
-  {
-    item: { canonicalName: "Skeleton-Double", nicknames: ["Skeleton Double"] },
-    refIndex: 6189,
-    score: 0.007568328950209746,
-  }
-]
