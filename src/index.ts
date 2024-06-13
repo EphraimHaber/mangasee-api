@@ -1,4 +1,1 @@
-console.log("giganigga");
-console.log("giganigga");
-console.log("giganigga");
-console.log("giganigga");
+console.log("hello world");
