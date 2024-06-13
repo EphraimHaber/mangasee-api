@@ -1,6 +1,6 @@
 export type MangaProvider = 'mangaSee' | 'Asura-scans';
 
-export interface Api {
+export interface MangaApi {
   search: (term: string) => Promise<MangaRecord[]>;
   getDetails: (uri: string) => Promise<MangaDetails>;
   getChapterSlides: (canonicalName: string, chapter: number, totalSlides: number) => string[];

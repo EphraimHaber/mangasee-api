@@ -9,7 +9,7 @@ every Api should have 3 methods:
 - getSlides - get the slides of specific manga episode
 
 ```typescript
-interface Api {
+interface MangaApi {
   search: (term: string) => Promise<MangaRecord[]>;
   getDetails: (uri: string) => Promise<MangaDetails>;
   getChapterSlides: (canonicalName: string, chapter: number, totalSlides: number) => string[];

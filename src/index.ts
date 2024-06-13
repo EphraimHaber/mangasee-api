@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { mangaSeeSearch } from './constants';
 import { getCoverImageUrl, getFirstChapterUrl, getRssDetails, getSlideUrl, toRealChapter } from './utils';
-import { Api, EpisodeDetails, MangaDetails, MangaRecord, RawMangaRecord } from './types/types';
+import { EpisodeDetails, MangaApi, MangaDetails, MangaRecord, RawMangaRecord } from './types/types';
 import Fuse from 'fuse.js';
 
 const mangaRecords: MangaRecord[] = [];
@@ -86,25 +86,26 @@ const getChapterSlides = (canonicalName: string, chapter: number, totalSlides: n
 
 (async () => {
   await getMangaList();
-  const searchRes = await search('skeleton');
+  // const searchRes = await search('skeleton');
   // console.log('Fucking Search results', searchRes);
-  const selectedManga = searchRes[0];
+  // const selectedManga = searchRes[0];
   // console.log('Fucking selectedManga', selectedManga);
-  const selectedMangaCanonicalName = selectedManga.canonicalName;
+  // const selectedMangaCanonicalName = selectedManga.canonicalName;
   // console.log('Fucking selectedMangaCanonicalName', selectedMangaCanonicalName);
-  const selectedMangaDetails = await getDetails(selectedMangaCanonicalName);
+  // const selectedMangaDetails = await getDetails(selectedMangaCanonicalName);
   // console.log('Fucking selectedMangaDetails', selectedMangaDetails);
 
   //get first episodes slides
-  const chapterSlides = getChapterSlides(
-    selectedMangaDetails.canonicalName,
-    selectedMangaDetails.chapters[0].chapter,
-    selectedMangaDetails.chapters[0].totalSlides,
-  );
-  console.log('Fucking chapterSlides', chapterSlides);
+
+  // const chapterSlides = getChapterSlides(
+  //   selectedMangaDetails.canonicalName,
+  //   selectedMangaDetails.chapters[0].chapter,
+  //   selectedMangaDetails.chapters[0].totalSlides,
+  // );
+  // console.log('Fucking chapterSlides', chapterSlides);
 })();
 
-export const mangaSeeApi: Partial<Api> = {
+export const mangaSeeApi: MangaApi = {
   search,
   getDetails,
   getChapterSlides,
