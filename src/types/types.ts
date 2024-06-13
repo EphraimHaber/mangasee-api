@@ -1,4 +1,13 @@
+import { FuseResult } from 'fuse.js';
+
 export type MangaProvider = 'mangaSee' | 'Asura-scans';
+
+export interface Api {
+  // search: (term: string) => FuseResult<MangaRecord>[];
+  search: (term: string) => Promise<MangaRecord[]>;
+  getDetails: (uri: string) => MangaDetails;
+  getSlides: (uri: string, episode: number) => string[];
+}
 
 export type RawMangaRecord = {
   i: string; // canonical name
@@ -7,10 +16,10 @@ export type RawMangaRecord = {
 };
 
 export type MangaRecord = {
-  canonicalName: string;
+  uri: string;
   coverUrl: string;
   fullName: string;
-  nicknames: string[];
+  nicknames?: string[];
 };
 
 export type mangaEpisodeSlide = {
@@ -26,4 +35,9 @@ export type MangaDetails = {
   fullName: string;
   episodeCount: number;
   missingEpisodes?: number[];
+};
+
+export type RssDetails = {
+  coverUrl: string;
+  fullName: string;
 };
