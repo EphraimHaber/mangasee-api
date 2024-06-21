@@ -1,3 +1,7 @@
+import axios from 'axios';
+import { CapacitorHttp, HttpHeaders, HttpResponse } from '@capacitor/core';
+import { httpGetHandler } from '../http-handler';
+
 export interface MangaApi {
   search: (term: string) => MangaRecord[];
   getDetails: (uri: string) => Promise<MangaDetails>;
@@ -30,7 +34,7 @@ export type MangaDetails = {
   canonicalName: string;
   chapters: EpisodeDetails[];
   missingChapters?: number[];
-};
+} & ExtraMangaDetails;
 
 export type RssDetails = {
   coverUrl: string;
@@ -38,4 +42,22 @@ export type RssDetails = {
   link: string;
 };
 
-export type GetRequest<ResponseType = any> = (...args: any[]) => Promise<ResponseType>;
+export type HttpHandlerMode = keyof typeof httpGetHandler;
+
+export type ExtraMangaDetails = {
+  'Author(s)': string[];
+  'Genre(s)': string[];
+  Type: string[];
+  Released: string[];
+  Status: string[];
+  Description: string;
+};
+
+type A = {
+  a: string;
+};
+type B = {
+  b: string;
+};
+
+type lol = A & B;
