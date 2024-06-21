@@ -10,7 +10,7 @@ every Api should have 3 methods:
 
 ```typescript
 (async () => {
-  const api = await initializeMangaSeeApi();
+  const api = await initializeMangaSeeApi('axios');
   console.log(api.mangaRecords.length);
   const searchRes = api.search('skeleton');
   console.log('Search results', searchRes);
@@ -25,6 +25,6 @@ every Api should have 3 methods:
     selectedMangaDetails.chapters[0].chapter,
     selectedMangaDetails.chapters[0].totalSlides,
   );
-  console.log('Fucking chapterSlides', chapterSlides);
+  console.log('chapterSlides', chapterSlides);
 })();
 ```

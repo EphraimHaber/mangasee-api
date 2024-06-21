@@ -5,12 +5,19 @@ import {
   chapterWithPaddingLength,
   rssBaseUrl,
   slideWithPaddingLength,
+  mangaMetadataBaseUrl,
 } from './constants';
 import { XMLParser } from 'fast-xml-parser';
-import { GetRequest, RssDetails } from './types/types';
+import { ExtraMangaDetails, HttpHandlerMode, RssDetails } from './types/types';
+import { doGet } from './http-handler';
+import { JSDOM } from 'jsdom';
 
 export const getCoverImageUrl = (uri: string): string => {
   return `${mangaCoverBaseUrl}${uri}.jpg`;
+};
+
+export const getMangeDetailsUrl = (canonicalName: string) => {
+  return `${mangaMetadataBaseUrl}${canonicalName}`;
 };
 
 export const getFirstChapterUrl = (uri: string): string => {
@@ -36,13 +43,9 @@ export const getSlideUrl = (canonicalName: string, chapter: number, slideNumber:
   return `${mangaSlideBaseUrl}${canonicalName}/${chapterPadding}${chapterString}-${slidePadding}${slideString}.png`;
 };
 
-export const getRssDetails = async (
-  canonicalName: string,
-  getRequest: GetRequest,
-  dataField: string,
-): Promise<RssDetails> => {
+export const getRssDetails = async (canonicalName: string, mode: HttpHandlerMode): Promise<RssDetails> => {
   const link = `${rssBaseUrl}${canonicalName}.xml`;
-  const res = (await getRequest(link))[dataField];
+  const res = await doGet(mode, link);
   const parser = new XMLParser();
   const mangaRssJsonDetails = parser.parse(res);
   return {
@@ -50,4 +53,57 @@ export const getRssDetails = async (
     coverUrl: mangaRssJsonDetails.rss.channel.image.url,
     link: mangaRssJsonDetails.rss.channel.link,
   };
+};
+
+const getNextAnchorSiblings = (elem: Element) => {
+  const anchorSiblings: HTMLAnchorElement[] = [];
+  let nextElem = elem.nextElementSibling;
+
+  while (nextElem) {
+    if (nextElem.tagName.toLowerCase() !== 'a') break;
+    anchorSiblings.push(nextElem as HTMLAnchorElement);
+    nextElem = nextElem.nextElementSibling;
+  }
+  return anchorSiblings;
+};
+
+export const getExtraDetails = async (canonicalName: string, mode: HttpHandlerMode) => {
+  const detailsUrl = getMangeDetailsUrl(canonicalName);
+  const res: string = await doGet(mode, detailsUrl);
+  const extraDetails = extractDetails(res);
+  return extraDetails;
+};
+
+export const getBetterHtml = (htmlString: string) => {
+  const dom = new JSDOM(htmlString);
+  const doc = dom.window.document;
+  const listItems: HTMLLIElement[] = Array.from(doc.querySelectorAll('li.list-group-item>span.mlabel'));
+  let resStr: string = '';
+  for (const listItem of listItems) {
+    resStr += listItem.parentElement?.innerHTML;
+    resStr += '\n';
+  }
+  return resStr;
+};
+
+export const extractDetails = (htmlString: string) => {
+  const betterDom = new JSDOM(getBetterHtml(htmlString));
+  const betterDoc = betterDom.window.document;
+
+  const keysElem = Array.from(betterDoc.querySelectorAll('.mlabel'));
+  const keys = keysElem.map(v => v.textContent?.replace(':', ''));
+
+  const res: Record<string, string | string[]> = {};
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i] as string;
+    if (key == 'RSS') continue;
+    if (key in res) continue;
+    if (key == 'Description') {
+      res[key] = betterDoc.querySelector('.top-5')?.textContent as string;
+    } else {
+      res[key] = getNextAnchorSiblings(keysElem[i]).map(v => v.textContent) as string[];
+    }
+  }
+  return res as ExtraMangaDetails;
 };

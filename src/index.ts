@@ -1,18 +1,24 @@
 import axios from 'axios';
 import { mangaSeeSearch } from './constants';
-import { getCoverImageUrl, getFirstChapterUrl, getRssDetails, getSlideUrl, toRealChapter } from './utils';
-import { EpisodeDetails, GetRequest, MangaApi, MangaDetails, MangaRecord, RawMangaRecord } from './types/types';
+import {
+  getCoverImageUrl,
+  getExtraDetails,
+  getFirstChapterUrl,
+  getRssDetails,
+  getSlideUrl,
+  toRealChapter,
+} from './utils';
+import { EpisodeDetails, HttpHandlerMode, MangaApi, MangaDetails, MangaRecord, RawMangaRecord } from './types/types';
 import Fuse from 'fuse.js';
+import { doGet } from './http-handler';
 
 class MangaSeeApi implements MangaApi {
-  private getRequest!: GetRequest;
-  private dataField: string;
+  private httpHandlerMode!: HttpHandlerMode;
   private initializationPromise: Promise<void>;
   public mangaRecords: MangaRecord[] = [];
 
-  constructor(getRequest?: GetRequest, dataField?: string) {
-    this.getRequest = getRequest || axios.get;
-    this.dataField = dataField || 'data';
+  constructor(httpHandlerMode?: HttpHandlerMode) {
+    this.httpHandlerMode = httpHandlerMode || 'axios';
     this.initializationPromise = this.initialize();
   }
 
@@ -25,7 +31,7 @@ class MangaSeeApi implements MangaApi {
   }
 
   private async getMangaList() {
-    const res: RawMangaRecord[] = (await this.getRequest(mangaSeeSearch))[this.dataField];
+    const res: RawMangaRecord[] = await doGet(this.httpHandlerMode, mangaSeeSearch, true);
     res.forEach(rawMangaRecord => {
       this.mangaRecords.push({
         canonicalName: rawMangaRecord.i,
@@ -54,12 +60,13 @@ class MangaSeeApi implements MangaApi {
 
   async getDetails(canonicalName: string): Promise<MangaDetails> {
     const firstChapterUrl = getFirstChapterUrl(canonicalName);
-    const res = (await this.getRequest(firstChapterUrl))[this.dataField] as string;
+    const res: string = await doGet(this.httpHandlerMode, firstChapterUrl);
     const chapterDetailsPattern = /vm\.CHAPTERS = (.*);/;
 
     // TODO separate getting the chapters with regex, check for missing episode and add episode to separate functions.
     const chaptersGroups = chapterDetailsPattern.exec(res);
-    const { coverUrl, fullName } = await getRssDetails(canonicalName, this.getRequest, this.dataField);
+    const { coverUrl, fullName } = await getRssDetails(canonicalName, this.httpHandlerMode);
+    const extraDetails = await getExtraDetails(canonicalName, this.httpHandlerMode);
     if (!chaptersGroups) {
       throw new Error('Unable To Retrieve Manga Details');
     }
@@ -91,6 +98,12 @@ class MangaSeeApi implements MangaApi {
       missingChapters: missingChapters,
       fullName: fullName,
       canonicalName: canonicalName,
+      'Author(s)': extraDetails['Author(s)'],
+      'Genre(s)': extraDetails['Genre(s)'],
+      Description: extraDetails.Description,
+      Released: extraDetails.Released,
+      Status: extraDetails.Status,
+      Type: extraDetails.Type,
     };
   }
 
@@ -102,8 +115,8 @@ class MangaSeeApi implements MangaApi {
     return chapterSlidesUrls;
   }
 }
-export const initializeMangaSeeApi = async () => {
-  const api = new MangaSeeApi();
+export const initializeMangaSeeApi = async (mode?: HttpHandlerMode) => {
+  const api = new MangaSeeApi(mode);
   await api.waitUntilInitialized();
   return api;
 };
