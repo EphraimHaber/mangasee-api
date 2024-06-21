@@ -52,12 +52,3 @@ export type ExtraMangaDetails = {
   Status: string[];
   Description: string;
 };
-
-type A = {
-  a: string;
-};
-type B = {
-  b: string;
-};
-
-type lol = A & B;
