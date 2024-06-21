@@ -1,7 +1,5 @@
-export type MangaProvider = 'mangaSee' | 'Asura-scans';
-
 export interface MangaApi {
-  search: (term: string) => Promise<MangaRecord[]>;
+  search: (term: string) => MangaRecord[];
   getDetails: (uri: string) => Promise<MangaDetails>;
   getChapterSlides: (canonicalName: string, chapter: number, totalSlides: number) => string[];
 }
@@ -17,14 +15,6 @@ export type MangaRecord = {
   coverUrl: string;
   fullName: string;
   nicknames?: string[];
-};
-
-export type mangaEpisodeSlide = {
-  src: string;
-};
-
-export type mangaEpisode = {
-  slides: mangaEpisodeSlide[];
 };
 
 export type EpisodeDetails = {
@@ -47,3 +37,5 @@ export type RssDetails = {
   fullName: string;
   link: string;
 };
+
+export type GetRequest<ResponseType = any> = (...args: any[]) => Promise<ResponseType>;

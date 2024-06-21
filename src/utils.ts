@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   mangaCoverBaseUrl,
   mangaReadOnlineBaseUrl,
@@ -8,7 +7,7 @@ import {
   slideWithPaddingLength,
 } from './constants';
 import { XMLParser } from 'fast-xml-parser';
-import { RssDetails } from './types/types';
+import { GetRequest, RssDetails } from './types/types';
 
 export const getCoverImageUrl = (uri: string): string => {
   return `${mangaCoverBaseUrl}${uri}.jpg`;
@@ -37,9 +36,13 @@ export const getSlideUrl = (canonicalName: string, chapter: number, slideNumber:
   return `${mangaSlideBaseUrl}${canonicalName}/${chapterPadding}${chapterString}-${slidePadding}${slideString}.png`;
 };
 
-export const getRssDetails = async (canonicalName: string): Promise<RssDetails> => {
+export const getRssDetails = async (
+  canonicalName: string,
+  getRequest: GetRequest,
+  dataField: string,
+): Promise<RssDetails> => {
   const link = `${rssBaseUrl}${canonicalName}.xml`;
-  const res = (await axios.get(link)).data;
+  const res = (await getRequest(link))[dataField];
   const parser = new XMLParser();
   const mangaRssJsonDetails = parser.parse(res);
   return {
