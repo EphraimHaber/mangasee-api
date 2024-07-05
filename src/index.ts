@@ -121,4 +121,4 @@ export const initializeMangaSeeApi = async (mode?: HttpHandlerMode) => {
   return api;
 };
 
-export { MangaRecord, EpisodeDetails, MangaDetails };
+export * from './types/types';
