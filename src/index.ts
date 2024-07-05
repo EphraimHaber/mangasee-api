@@ -120,3 +120,5 @@ export const initializeMangaSeeApi = async (mode?: HttpHandlerMode) => {
   await api.waitUntilInitialized();
   return api;
 };
+
+export { MangaRecord, EpisodeDetails, MangaDetails };
