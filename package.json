@@ -1,6 +1,6 @@
 {
   "name": "mangasee-api",
-  "version": "1.1.5",
+  "version": "1.1.7",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -14,11 +14,19 @@
     "README.md",
     "package.json"
   ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "lint": "tsc",
     "prettier": "npx prettier --write .",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build2": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup ./src",
     "release": "npm run build && changeset publish",
     "clean": "rimraf dist",
     "prepublish": "npm run clean && tsc",
@@ -38,10 +46,9 @@
   },
   "dependencies": {
     "@capacitor/core": "^6.1.0",
-    "@types/jsdom": "^21.1.7",
     "axios": "^1.7.2",
     "fast-xml-parser": "^4.4.0",
     "fuse.js": "^7.0.0",
-    "jsdom": "^24.1.0"
+    "linkedom": "^0.18.4"
   }
 }

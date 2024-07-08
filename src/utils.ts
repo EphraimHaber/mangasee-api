@@ -10,7 +10,7 @@ import {
 import { XMLParser } from 'fast-xml-parser';
 import { ExtraMangaDetails, HttpHandlerMode, RssDetails } from './types/types';
 import { doGet } from './http-handler';
-import { JSDOM } from 'jsdom';
+import { parseHTML } from 'linkedom';
 
 export const getCoverImageUrl = (uri: string): string => {
   return `${mangaCoverBaseUrl}${uri}.jpg`;
@@ -74,10 +74,9 @@ export const getExtraDetails = async (canonicalName: string, mode: HttpHandlerMo
   return extraDetails;
 };
 
-export const getBetterHtml = (htmlString: string) => {
-  const dom = new JSDOM(htmlString);
-  const doc = dom.window.document;
-  const listItems: HTMLLIElement[] = Array.from(doc.querySelectorAll('li.list-group-item>span.mlabel'));
+const getBetterHtml = (htmlString: string) => {
+  const { window, document, customElements, HTMLElement, Event, CustomEvent } = parseHTML(htmlString);
+  const listItems: HTMLLIElement[] = Array.from(document.querySelectorAll('li.list-group-item>span.mlabel'));
   let resStr: string = '';
   for (const listItem of listItems) {
     resStr += listItem.parentElement?.innerHTML;
@@ -87,8 +86,8 @@ export const getBetterHtml = (htmlString: string) => {
 };
 
 export const extractDetails = (htmlString: string) => {
-  const betterDom = new JSDOM(getBetterHtml(htmlString));
-  const betterDoc = betterDom.window.document;
+  const { window, document, customElements, HTMLElement, Event, CustomEvent } = parseHTML(getBetterHtml(htmlString));
+  const betterDoc = document;
 
   const keysElem = Array.from(betterDoc.querySelectorAll('.mlabel'));
   const keys = keysElem.map(v => v.textContent?.replace(':', ''));
