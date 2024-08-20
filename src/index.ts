@@ -12,7 +12,7 @@ import { EpisodeDetails, HttpHandlerMode, MangaApi, MangaDetails, MangaRecord, R
 import Fuse from 'fuse.js';
 import { doGet } from './http-handler';
 
-class MangaSeeApi implements MangaApi {
+export class MangaSeeApi implements MangaApi {
   private httpHandlerMode!: HttpHandlerMode;
   private initializationPromise: Promise<void>;
   public mangaRecords: MangaRecord[] = [];
