@@ -14,13 +14,13 @@ every Api should have 3 methods:
   console.log(api.mangaRecords.length);
   const searchRes = api.search('skeleton');
   console.log('Search results', searchRes);
-  const selectedManga = searchRes[0];
+  const selectedManga = searchRes[1];
   console.log('selectedManga', selectedManga);
   const selectedMangaCanonicalName = selectedManga!.canonicalName;
   console.log('selectedMangaCanonicalName', selectedMangaCanonicalName);
   const selectedMangaDetails = await api.getDetails(selectedMangaCanonicalName);
   console.log('selectedMangaDetails', selectedMangaDetails);
-  const chapterSlides = api.getChapterSlides(
+  const chapterSlides = await api.getChapterSlides(
     selectedMangaDetails.canonicalName,
     selectedMangaDetails.chapters[0].chapter,
     selectedMangaDetails.chapters[0].totalSlides,

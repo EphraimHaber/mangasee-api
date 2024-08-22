@@ -35,12 +35,28 @@ export const toRealChapter = (paddedChapter: string): number => {
   return Number(trimmedPaddedChapter);
 };
 
-export const getSlideUrl = (canonicalName: string, chapter: number, slideNumber: number): string => {
+export const getImageSlideHostBaseUrl = async (mode: HttpHandlerMode, canonicalName: string) => {
+  const firstChapterUrl = getFirstChapterUrl(canonicalName);
+  const res: string = await doGet(mode, firstChapterUrl);
+  const match = res.match(/vm\.CurPathName\s*=\s*"([^"]+)";/);
+  if (match && match[1]) {
+    const extractedString = match[1];
+    return `https://${extractedString}/manga/`;
+  }
+  return mangaSlideBaseUrl;
+};
+
+export const getSlideUrl = (
+  canonicalName: string,
+  chapter: number,
+  slideNumber: number,
+  slideHostBaseUrl: string,
+): string => {
   const chapterString = chapter.toString();
   const slideString = slideNumber.toString();
   const chapterPadding = '0'.repeat(chapterWithPaddingLength - chapterString.length);
   const slidePadding = '0'.repeat(slideWithPaddingLength - slideString.length);
-  return `${mangaSlideBaseUrl}${canonicalName}/${chapterPadding}${chapterString}-${slidePadding}${slideString}.png`;
+  return `${slideHostBaseUrl}${canonicalName}/${chapterPadding}${chapterString}-${slidePadding}${slideString}.png`;
 };
 
 export const getRssDetails = async (canonicalName: string, mode: HttpHandlerMode): Promise<RssDetails> => {

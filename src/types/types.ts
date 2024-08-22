@@ -5,7 +5,7 @@ import { httpGetHandler } from '../http-handler';
 export interface MangaApi {
   search: (term: string) => MangaRecord[];
   getDetails: (uri: string) => Promise<MangaDetails>;
-  getChapterSlides: (canonicalName: string, chapter: number, totalSlides: number) => string[];
+  getChapterSlides: (canonicalName: string, chapter: number, totalSlides: number) => Promise<string[]>;
 }
 
 export type RawMangaRecord = {

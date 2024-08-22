@@ -4,6 +4,7 @@ import {
   getCoverImageUrl,
   getExtraDetails,
   getFirstChapterUrl,
+  getImageSlideHostBaseUrl,
   getRssDetails,
   getSlideUrl,
   toRealChapter,
@@ -107,10 +108,11 @@ export class MangaSeeApi implements MangaApi {
     };
   }
 
-  getChapterSlides(canonicalName: string, chapter: number, totalSlides: number) {
+  async getChapterSlides(canonicalName: string, chapter: number, totalSlides: number) {
+    const slidesHost = await getImageSlideHostBaseUrl(this.httpHandlerMode, canonicalName);
     const chapterSlidesUrls: string[] = [];
     for (let i = 1; i <= totalSlides; i++) {
-      chapterSlidesUrls.push(getSlideUrl(canonicalName, chapter, i));
+      chapterSlidesUrls.push(getSlideUrl(canonicalName, chapter, i, slidesHost));
     }
     return chapterSlidesUrls;
   }
