@@ -31,7 +31,7 @@
     "prettier": "npx prettier --write .",
     "build2": "tsup src/index.ts --format cjs,esm --dts",
     "build": "tsup ./src",
-    "release": "npm run build && changeset publish --no-git-tag",
+    "release": "npm run build && changeset publish",
     "clean": "rimraf dist",
     "prepublish": "npm run clean && tsc",
     "start:prod": "npm run clean && tsc && node dist/index.js"
